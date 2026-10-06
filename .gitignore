@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.DS_Store
+.pytest_cache/
+*.egg-info/
+.ipynb_checkpoints/
+.env
+.agents/
+.claude/
+data/
+*.duckdb
+*.duckdb.wal

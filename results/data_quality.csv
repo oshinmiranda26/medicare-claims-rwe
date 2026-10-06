@@ -1,0 +1,18 @@
+check_name,n_flagged,n_records,pct_flagged
+bene: duplicate beneficiary-year rows,0,343644,0.0
+bene: unparseable or missing birth date,0,343644,0.0
+bene: implausible age (<0 or >110 on Jan 1 of file year),0,343644,0.0
+bene: coverage months outside 0-12,0,343644,0.0
+bene: record in a year after death,0,343644,0.0
+inpatient: duplicate claim id + segment,0,66773,0.0
+inpatient: missing or unparseable claim start date,68,66773,0.102
+inpatient: claim end before start,0,66773,0.0
+inpatient: claim after beneficiary death,0,66773,0.0
+inpatient: beneficiary missing from summary file,0,66773,0.0
+inpatient: claim year without Part A coverage,479,66773,0.717
+outpatient: missing or unparseable claim start date,11253,790790,1.423
+outpatient: claim end before start,0,790790,0.0
+pde: missing or unparseable fill date,0,5552421,0.0
+"pde: days supply missing, zero, or > 365",117726,5552421,2.12
+pde: fill after beneficiary death,0,5552421,0.0
+pde: fill in a year without Part D coverage,23088,5552421,0.416
