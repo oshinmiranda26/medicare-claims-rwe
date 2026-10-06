@@ -1,0 +1,15 @@
+characteristic,value
+Beneficiaries,"1,681"
+"Age at index, mean (SD)",77.8 (8.6)
+Female,62.6%
+Race: White,84.1%
+Race: Black,9.1%
+Race: Other,4.3%
+Race: Hispanic,2.6%
+"Charlson index, mean (SD)",3.11 (3.06)
+Charlson index 0,25.5%
+Charlson index 1-2,25.8%
+Charlson index 3+,48.7%
+CMS chronic-condition depression flag (2009),99.6%
+Hospitalized within 1 year,27.7%
+Died within 1 year,1.0%

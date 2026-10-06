@@ -1,12 +1,12 @@
 import duckdb
 
-from medicare_rwe.pipeline import STEPS, profile, run_sql_file
+from medicare_rwe import pipeline
+from medicare_rwe.pipeline import profile
 
 
 def build(raw_dir):
     con = duckdb.connect()
-    for step in STEPS:
-        run_sql_file(con, step, raw_dir=raw_dir.as_posix())
+    pipeline.build(con, raw_dir.as_posix())
     return con
 
 
@@ -38,3 +38,22 @@ def test_planted_quality_problems_are_caught(raw_dir):
     assert c["pde: days supply missing, zero, or > 365"] == 1
     assert c["pde: fill after beneficiary death"] == 1
     assert c["bene: implausible age (<0 or >110 on Jan 1 of file year)"] == 0
+
+
+def test_cohort_criteria_and_attrition(cohort_raw_dir):
+    con = build(cohort_raw_dir)
+    att = dict(con.execute("SELECT step, n_remaining FROM attrition").fetchall())
+    assert att == {1: 6, 2: 5, 3: 4, 4: 3, 5: 2, 6: 1, 7: 1}
+    rows = con.execute("SELECT bene_id, index_dt::VARCHAR, charlson_index, hospitalized_1y, days_followed "
+                       "FROM cohort").fetchall()
+    # D: index 2009-03-01; baseline CHF (1) + complicated diabetes (2, replaces uncomplicated) = 3;
+    # admitted 2009-06-01 -> event after 92 days. The index-day inpatient claim does not count as the outcome.
+    assert rows == [("D", "2009-03-01", 3, True, 92)]
+
+
+def test_charlson_prefixes():
+    from medicare_rwe.charlson import codes_frame
+    df = codes_frame()
+    chf = df[df.condition == "congestive_heart_failure"].prefix
+    assert "428" in set(chf) and "4254" in set(chf) and "4253" not in set(chf)
+    assert "042" in set(df[df.condition == "hiv_aids"].prefix)

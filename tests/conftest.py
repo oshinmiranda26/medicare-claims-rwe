@@ -51,3 +51,31 @@ def raw_dir(tmp_path):
            {"DESYNPUF_ID": "B", "PDE_ID": "p3", "SRVC_DT": "20091110", "PROD_SRVC_ID": "00093", "DAYS_SUPLY_NUM": "30"}]
     write(tmp_path / "DE1_0_2008_to_2010_Prescription_Drug_Events_Sample_1.csv", PDE_COLS, pde)
     return tmp_path
+
+
+@pytest.fixture
+def cohort_raw_dir(tmp_path):
+    """Six beneficiaries, each failing a different cohort step, except D who qualifies.
+
+    Y: under 65 | N: missing Part D in 2008 | H: Medicare Advantage months | X: no depression diagnosis
+    P: prevalent (diagnosed in 2008 too) | D: qualifies
+    """
+    def b(pid, birth="19350101", d=12, hmo=0):
+        r = bene(pid, birth=birth, d=d)
+        r["BENE_HMO_CVRAGE_TOT_MONS"] = str(hmo)
+        return r
+    for year in (2008, 2009, 2010):
+        rows = [b("D"), b("Y", birth="19600101"), b("N", d=6 if year == 2008 else 12),
+                b("H", hmo=3 if year == 2009 else 0), b("X"), b("P")]
+        write(tmp_path / f"DE1_0_{year}_Beneficiary_Summary_File_Sample_1.csv", BENE_COLS, rows)
+    dx = lambda pid, cid, dt, *codes: {"DESYNPUF_ID": pid, "CLM_ID": cid, "SEGMENT": "1", "CLM_FROM_DT": dt,
+                                      "CLM_THRU_DT": dt, **{f"ICD9_DGNS_CD_{i + 1}": c for i, c in enumerate(codes)}}
+    op = [dx(pid, f"o{pid}", "20090301", "311") for pid in ("D", "Y", "N", "H", "P")]
+    op += [dx("D", "oD0", "20080601", "4280", "25000", "25040"), dx("P", "oP0", "20080601", "29620"),
+           dx("X", "oX", "20090301", "4019")]
+    write(tmp_path / "DE1_0_2008_to_2010_Outpatient_Claims_Sample_1.csv", CLAIM_COLS, op)
+    ip = [dx("D", "iD0", "20090301", "311"),            # same day as index: not an outcome
+          dx("D", "iD1", "20090601", "486")]            # first admission after index
+    write(tmp_path / "DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.csv", CLAIM_COLS, ip)
+    write(tmp_path / "DE1_0_2008_to_2010_Prescription_Drug_Events_Sample_1.csv", PDE_COLS, [])
+    return tmp_path

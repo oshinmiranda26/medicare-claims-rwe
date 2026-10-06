@@ -1,0 +1,8 @@
+step,criterion,n_remaining,excluded
+1,Beneficiaries with a 2009 record,114538,0
+2,"Aged 65 or older on Jan 1, 2009",95730,18808
+3,"Continuous Part A, B, and D coverage in 2008-2009",46374,49356
+4,Fee-for-service only (no HMO months) in 2008-2009,27935,18439
+5,Depression diagnosis in 2009 (index date = first),1878,26057
+6,New diagnosis: none in the prior 365 days,1681,197
+7,Alive on the index date,1681,0
